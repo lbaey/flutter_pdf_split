@@ -21,7 +21,7 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                                            message: "Arguments not sended",
                                            details: nil))
             }
-            let pdfFilePath = args["path"] as! String
+            let pdfFilePath = args["filePath"] as! String
             
             if #available(iOS 11.0, *) {
                 let url = NSURL.fileURL(withPath: pdfFilePath)

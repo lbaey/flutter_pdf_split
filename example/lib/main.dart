@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdf_split/flutter_pdf_split.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -17,11 +19,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   int _pageCount;
+  String _outDirectory;
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    askPermission();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -44,10 +48,20 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> askPermission() async {
+    await Permission.storage.request();
+  }
+
   void _openFileExplorer() async {
+
+    // the output directory must be chosen first
+    if (_outDirectory == null) {
+      return;
+    }
+
     FilePickerResult result = await FilePicker.platform.pickFiles();
 
-    if(result != null) {
+    if (result != null) {
       PlatformFile file = result.files.first;
 
       print(file.name);
@@ -56,10 +70,25 @@ class _MyAppState extends State<MyApp> {
       print(file.extension);
       print(file.path);
 
-      int pageCount = await FlutterPdfSplit.split(file.path);
+      int pageCount = await FlutterPdfSplit.split(
+          {"filePath": file.path, "outDirectory": _outDirectory});
 
       setState(() {
         _pageCount = pageCount;
+      });
+    } else {
+      // User canceled the picker
+    }
+  }
+
+  void _openDirectoryExplorer() async {
+    String directory = await FilePicker.platform.getDirectoryPath();
+
+    if (directory != null) {
+      print(directory);
+
+      setState(() {
+        _outDirectory = directory;
       });
     } else {
       // User canceled the picker
@@ -74,17 +103,18 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Column(
-            children: [
-              Text('Running on: $_platformVersion\n'),
-              RaisedButton(
-                onPressed: () => _openFileExplorer(),
-                child: Text("Open file picker"),
-              ),
-              Text('Splitted pdf: $_pageCount pages\n'),
-            ]
-          )
-        ),
+            child: Column(children: [
+          Text('Running on: $_platformVersion\n'),
+          RaisedButton(
+            onPressed: () => _openDirectoryExplorer(),
+            child: Text("Choose output directory"),
+          ),
+          RaisedButton(
+            onPressed: () => _openFileExplorer(),
+            child: Text("Choose input PDF file"),
+          ),
+          Text('Splitted pdf: $_pageCount pages\n'),
+        ])),
       ),
     );
   }
