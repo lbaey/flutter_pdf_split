@@ -126,7 +126,7 @@ class _MyAppState extends State<MyApp> {
                   itemCount: _pageCount,
                   itemBuilder: (BuildContext context, int index) {
                       return Container(
-                        height: 30,
+                        height: 100,
                         child: Center(
                             child: Text(_pagePaths[index])
                         ),
