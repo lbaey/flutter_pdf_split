@@ -17,8 +17,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   int _pageCount;
-  List<PlatformFile> _paths;
-  String _fileName;
 
   @override
   void initState() {
@@ -66,26 +64,7 @@ class _MyAppState extends State<MyApp> {
     } else {
       // User canceled the picker
     }
-
-    // try {
-    //   _paths = (await FilePicker.platform.pickFiles(
-    //     type: FileType.custom,
-    //     allowedExtensions: ['pdf'],
-    //   ))
-    //       ?.files;
-    // } on PlatformException catch (e) {
-    //   print("Unsupported operation" + e.toString());
-    // } catch (ex) {
-    //   print(ex);
-    // }
-    // if (!mounted) return;
-    // setState(() {
-    //   //_loadingPath = false;
-    //   _fileName = _paths != null ? _paths.map((e) => e.name).toString() : '...';
-    // });
   }
-  // Il me faut un bouton qui récupère un chemin d'un pdf dans un répertoire ou on peut écrire
-  // FlutterPdfSplit.split(filePath)
 
   @override
   Widget build(BuildContext context) {
