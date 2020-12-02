@@ -11,17 +11,17 @@ class FlutterPdfSplit {
     return version;
   }
 
-  static Future<int> split(Map<String, String> args) async {
-    // todo verify args keys
+  static Future<Map<dynamic,dynamic>> split(Map<String, String> args) async {
+    // TODO verify args keys
     return _split(args);
   }
 
   /// Splits PDF file [value] and returns the page count.
-  static Future<int> _split(Map<String, String> args) async {
-    int pages = await _channel.invokeMethod('split', {
+  static Future<Map<dynamic,dynamic>> _split(Map<String, String> args) async {
+    Map<dynamic,dynamic> result = await _channel.invokeMethod('split', {
       "filePath": args["filePath"],
       "outDirectory": args["outDirectory"]
     });
-    return pages;
+    return result;
   }
 }

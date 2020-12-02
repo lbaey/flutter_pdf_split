@@ -18,7 +18,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  int _pageCount;
+  int _pageCount = 0;
+  List<dynamic> _pagePaths = new List();
   String _outDirectory;
 
   @override
@@ -70,11 +71,15 @@ class _MyAppState extends State<MyApp> {
       print(file.extension);
       print(file.path);
 
-      int pageCount = await FlutterPdfSplit.split(
-          {"filePath": file.path, "outDirectory": _outDirectory});
+      Map<dynamic,dynamic> splitResult = await FlutterPdfSplit.split(
+          {"filePath": file.path, "outDirectory": _outDirectory}
+      );
+
+      print(splitResult);
 
       setState(() {
-        _pageCount = pageCount;
+        _pageCount = splitResult["pageCount"];
+        _pagePaths = splitResult["pagePaths"];
       });
     } else {
       // User canceled the picker
@@ -103,18 +108,37 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-            child: Column(children: [
-          Text('Running on: $_platformVersion\n'),
-          RaisedButton(
-            onPressed: () => _openDirectoryExplorer(),
-            child: Text("Choose output directory"),
-          ),
-          RaisedButton(
-            onPressed: () => _openFileExplorer(),
-            child: Text("Choose input PDF file"),
-          ),
-          Text('Splitted pdf: $_pageCount pages\n'),
-        ])),
+            child: Column(
+              children: [
+                Text('Running on: $_platformVersion\n'),
+                RaisedButton(
+                  onPressed: () => _openDirectoryExplorer(),
+                  child: Text("Choose output directory"),
+                ),
+                RaisedButton(
+                  onPressed: () => _openFileExplorer(),
+                  child: Text("Choose input PDF file"),
+                ),
+                Text('Splitted pdf: $_pageCount pages\n'),
+                _pagePaths.isNotEmpty
+                ?
+                Flexible(child: ListView.builder(
+                  itemCount: _pageCount,
+                  itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        height: 30,
+                        child: Center(
+                            child: Text(_pagePaths[index])
+                        ),
+                      );
+
+                  }
+                ))
+                :
+                Text("Select a file")
+              ]
+            )
+        ),
       ),
     );
   }

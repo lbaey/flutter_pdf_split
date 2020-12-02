@@ -30,16 +30,17 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                     let pdfDocument = PDFDocument(url: url)
                     
                     let pages = pdfDocument!.pageCount
-                    result(pages)
                     
                     for index in 0...pages-1 {
                         let page = (pdfDocument?.page(at: index))!
-                        let singePageFilename = outDirectory + "/page_" + String(index) + ".pdf"
+                        let singlePageFilename = outDirectory + "/page_" + String(index) + ".pdf"
                         let singlePage = PDFDocument.init()
                         singlePage.insert(page, at: 0)
-                        singlePage.write(toFile: singePageFilename)
-                        print(singePageFilename)
+                        singlePage.write(toFile: singlePageFilename)
+                        print(singlePageFilename)
                     }
+                    
+                    result(pages)
                 }
             } else {
                 result(FlutterMethodNotImplemented)

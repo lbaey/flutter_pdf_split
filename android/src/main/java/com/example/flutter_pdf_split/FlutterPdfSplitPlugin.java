@@ -7,8 +7,12 @@ import com.tom_roush.pdfbox.pdmodel.PDDocument;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -75,6 +79,7 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
 
             //Saving each page as an individual document
             int i = 1;
+            List<String> pagePaths = new ArrayList<>();
 
             while (iterator.hasNext()) {
                 PDDocument pd = iterator.next();
@@ -83,6 +88,7 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
                     pd.save(singlePageFileName);
                     android.util.Log.d(TAG, "onMethodCall: " + singlePageFileName);
                     pd.close();
+                    pagePaths.add(singlePageFileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                     result.error("PDF_SPLIT", "Error saving " + singlePageFileName, null);
@@ -94,7 +100,11 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
                 e.printStackTrace();
                 result.error("PDF_SPLIT", "Error closing " + path, null);
             }
-            result.success(Pages.size());
+
+            Map splitResult = new HashMap<String,Object>();
+            splitResult.put("pageCount", Pages.size());
+            splitResult.put("pagePaths", pagePaths);
+            result.success(splitResult);
         } else {
             result.notImplemented();
         }
