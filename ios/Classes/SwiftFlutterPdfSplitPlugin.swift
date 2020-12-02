@@ -22,7 +22,8 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                                            details: nil))
             }
             let pdfFilePath = args["filePath"] as! String
-            
+            let outDirectory = args["outDirectory"] as! String
+
             if #available(iOS 11.0, *) {
                 let url = NSURL.fileURL(withPath: pdfFilePath)
                 if url.isFileURL {
@@ -33,10 +34,11 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                     
                     for index in 0...pages-1 {
                         let page = (pdfDocument?.page(at: index))!
+                        let singePageFilename = outDirectory + "/page_" + String(index) + ".pdf"
                         let singlePage = PDFDocument.init()
                         singlePage.insert(page, at: 0)
-                        singlePage.write(toFile: String(pdfFilePath) + "_" + String(index) + ".pdf")
-                        print(String(pdfFilePath) + "_" + String(index) + ".pdf")
+                        singlePage.write(toFile: singePageFilename)
+                        print(singePageFilename)
                     }
                 }
             } else {

@@ -36,6 +36,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_pdf_split (0.0.1):
     - Flutter
+  - "permission_handler (5.0.1+1)":
+    - Flutter
   - SDWebImage (5.10.0):
     - SDWebImage/Core (= 5.10.0)
   - SDWebImage/Core (5.10.0)
@@ -45,6 +47,7 @@ DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_pdf_split (from `.symlinks/plugins/flutter_pdf_split/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
 
 SPEC REPOS:
   trunk:
@@ -60,6 +63,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_pdf_split:
     :path: ".symlinks/plugins/flutter_pdf_split/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
 
 SPEC CHECKSUMS:
   DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
@@ -67,6 +72,7 @@ SPEC CHECKSUMS:
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_pdf_split: 2defc56338a6702307c589f9a9571cdd96de0129
+  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
   SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
   SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
 
