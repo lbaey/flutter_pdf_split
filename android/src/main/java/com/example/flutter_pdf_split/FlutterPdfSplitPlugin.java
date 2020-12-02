@@ -24,6 +24,7 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private MethodChannel channel;
+  private static final String TAG = "FlutterPdfSplitPlugin";
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -70,12 +71,21 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
 
       while(iterator.hasNext()){
         PDDocument pd = iterator.next();
+        String singlePageFileName = shortPath + "_" + i++ + ".pdf";
         try {
-          pd.save(shortPath + "_" + i++ + ".pdf");
+          pd.save(singlePageFileName);
+          android.util.Log.d(TAG, "onMethodCall: " + singlePageFileName);
+          pd.close();
         } catch (IOException e) {
           e.printStackTrace();
-          result.error("PDF_SPLIT", "Error saving " + shortPath + "_" + (i - 1), null );
+          result.error("PDF_SPLIT", "Error saving " + singlePageFileName, null );
         }
+      }
+      try {
+        doc.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+        result.error("PDF_SPLIT", "Error closing " + path, null );
       }
       result.success(Pages.size());
     } else {
