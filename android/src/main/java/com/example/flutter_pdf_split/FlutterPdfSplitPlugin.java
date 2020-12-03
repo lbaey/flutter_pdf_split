@@ -45,12 +45,17 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
         } else if (call.method.equals("split")) {
             String path = call.argument("filePath");
             String outDirectory = call.argument("outDirectory");
+            String outFileNamePrefix = call.argument("outFileNamePrefix");
+
+            // Check out file name
+            if (outFileNamePrefix == null)
+                result.error("PDF_SPLIT", "Output file prefix must not be null", null);
 
             //Verifying outDirectory existence
             File directory = new File(outDirectory);
-            if (!directory.isDirectory()) {
+            if (!directory.isDirectory())
                 result.error("PDF_SPLIT", "outDirectory " + outDirectory + "is not a directory", null);
-            }
+
 
             //Loading an existing PDF document
             File file = new File(path);
@@ -83,7 +88,7 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
 
             while (iterator.hasNext()) {
                 PDDocument pd = iterator.next();
-                String singlePageFileName = outDirectory + "/page_" + i++ + ".pdf";
+                String singlePageFileName = outDirectory + "/" + outFileNamePrefix + i++ + ".pdf";
                 try {
                     pd.save(singlePageFileName);
                     android.util.Log.d(TAG, "onMethodCall: " + singlePageFileName);
@@ -101,7 +106,7 @@ public class FlutterPdfSplitPlugin implements FlutterPlugin, MethodCallHandler {
                 result.error("PDF_SPLIT", "Error closing " + path, null);
             }
 
-            Map splitResult = new HashMap<String,Object>();
+            Map splitResult = new HashMap<String, Object>();
             splitResult.put("pageCount", Pages.size());
             splitResult.put("pagePaths", pagePaths);
             result.success(splitResult);
