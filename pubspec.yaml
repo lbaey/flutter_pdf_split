@@ -1,8 +1,8 @@
 name: flutter_pdf_split
 description: A new flutter plugin project.
 version: 0.0.1
-author:
-homepage:
+author: Mobizel
+homepage: https://github.com/lbaey/flutter_pdf_split
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

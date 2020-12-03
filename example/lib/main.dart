@@ -1,10 +1,9 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdf_split/flutter_pdf_split.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -18,8 +17,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  int _pageCount = 0;
-  List<dynamic> _pagePaths = new List();
+  FlutterPdfSplitResult _splitResult;
   String _outDirectory;
 
   @override
@@ -29,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     askPermission();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
+  /// Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -42,11 +40,7 @@ class _MyAppState extends State<MyApp> {
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    if (mounted) setState(() => _platformVersion = platformVersion);
   }
 
   Future<void> askPermission() async {
@@ -54,7 +48,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _openFileExplorer() async {
-
     // the output directory must be chosen first
     if (_outDirectory == null) {
       return;
@@ -65,22 +58,19 @@ class _MyAppState extends State<MyApp> {
     if (result != null) {
       PlatformFile file = result.files.first;
 
-      print(file.name);
-      print(file.bytes);
-      print(file.size);
-      print(file.extension);
-      print(file.path);
+      debugPrint(file.name);
+      debugPrint(file.bytes.toString());
+      debugPrint(file.size.toString());
+      debugPrint(file.extension);
+      debugPrint(file.path);
 
-      Map<dynamic,dynamic> splitResult = await FlutterPdfSplit.split(
-          {"filePath": file.path, "outDirectory": _outDirectory}
+      FlutterPdfSplitResult splitResult = await FlutterPdfSplit.split(
+        FlutterPdfSplitArgs(file.path, _outDirectory, outFilePrefix: "Test"),
       );
 
-      print(splitResult);
+      debugPrint(splitResult.toString());
 
-      setState(() {
-        _pageCount = splitResult["pageCount"];
-        _pagePaths = splitResult["pagePaths"];
-      });
+      if (mounted) setState(() => _splitResult = splitResult);
     } else {
       // User canceled the picker
     }
@@ -90,11 +80,8 @@ class _MyAppState extends State<MyApp> {
     String directory = await FilePicker.platform.getDirectoryPath();
 
     if (directory != null) {
-      print(directory);
-
-      setState(() {
-        _outDirectory = directory;
-      });
+      debugPrint(directory);
+      setState(() => _outDirectory = directory);
     } else {
       // User canceled the picker
     }
@@ -104,40 +91,41 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-            child: Column(
-              children: [
-                Text('Running on: $_platformVersion\n'),
-                RaisedButton(
-                  onPressed: () => _openDirectoryExplorer(),
-                  child: Text("Choose output directory"),
-                ),
-                RaisedButton(
-                  onPressed: () => _openFileExplorer(),
-                  child: Text("Choose input PDF file"),
-                ),
-                Text('Splitted pdf: $_pageCount pages\n'),
-                _pagePaths.isNotEmpty
-                ?
-                Flexible(child: ListView.builder(
-                  itemCount: _pageCount,
-                  itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        height: 100,
-                        child: Center(
-                            child: Text(_pagePaths[index])
-                        ),
-                      );
-
-                  }
-                ))
-                :
-                Text("Select a file")
-              ]
-            )
+        appBar: AppBar(title: const Text('Plugin example app')),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Text('Running on: $_platformVersion'),
+                  ),
+                  RaisedButton(
+                    onPressed: _openDirectoryExplorer,
+                    child: Text("Choose output directory"),
+                  ),
+                  RaisedButton(
+                    onPressed: _outDirectory == null ? null : _openFileExplorer,
+                    child: Text("Choose input PDF file"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Text(_outDirectory == null
+                        ? "Select directory"
+                        : (_splitResult?.pageCount == null
+                            ? "Select a file"
+                            : 'Splitted pdf: ${_splitResult?.pageCount ?? 0} pages')),
+                  ),
+                  for (String path in _splitResult?.pagePaths ?? []) Text(path)
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
