@@ -23,7 +23,7 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
             }
             let pdfFilePath = args["filePath"] as! String
             let outDirectory = args["outDirectory"] as! String
-            let outDirectory = args["outFileNamePrefix"] as! String
+            let outFileNamePrefix = args["outFileNamePrefix"] as! String
 
             if #available(iOS 11.0, *) {
                 let url = NSURL.fileURL(withPath: pdfFilePath)
