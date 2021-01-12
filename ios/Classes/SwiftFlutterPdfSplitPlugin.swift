@@ -29,18 +29,25 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                 let url = NSURL.fileURL(withPath: pdfFilePath)
                 if url.isFileURL {
                     let pdfDocument = PDFDocument(url: url)
-                    
+                
                     let pages = pdfDocument!.pageCount
                     var pagePaths = [String]()
                     
                     for index in 0...pages-1 {
                         let page = (pdfDocument?.page(at: index))!
                         let singlePageFilename = outDirectory + "/" + outFileNamePrefix + String(index) + ".pdf"
+                        let singlePageFilenameUrl = NSURL.fileURL(withPath: singlePageFilename)
                         let singlePage = PDFDocument.init()
                         singlePage.insert(page, at: 0)
                         
+                    
                         let documentDataForSaving = singlePage.dataRepresentation()
-                        documentDataForSaving.write(toFile: singlePageFilename)
+                        
+                        do {
+                            try documentDataForSaving?.write(to: singlePageFilenameUrl)
+                        } catch {
+                            print(error)
+                        }
                         
                         pagePaths.append(singlePageFilename)
                         print(singlePageFilename)
