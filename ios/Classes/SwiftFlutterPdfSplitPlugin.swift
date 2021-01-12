@@ -41,7 +41,7 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                         singlePage.insert(page, at: 0)
                         
                     
-                        let documentDataForSaving = singlePage.dataRepresentation()
+                        let documentDataForSaving : Data! = singlePage.dataRepresentation()
                         
                         do {
                             try documentDataForSaving?.write(to: singlePageFilenameUrl)
