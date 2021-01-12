@@ -38,7 +38,10 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                         let singlePageFilename = outDirectory + "/" + outFileNamePrefix + String(index) + ".pdf"
                         let singlePage = PDFDocument.init()
                         singlePage.insert(page, at: 0)
-                        singlePage.write(toFile: singlePageFilename)
+                        
+                        let documentDataForSaving = singlePage.dataRepresentation()
+                        documentDataForSaving.write(toFile: singlePageFilename)
+                        
                         pagePaths.append(singlePageFilename)
                         print(singlePageFilename)
                     }
