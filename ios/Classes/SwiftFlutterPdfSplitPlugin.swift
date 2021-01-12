@@ -39,11 +39,10 @@ public class SwiftFlutterPdfSplitPlugin: NSObject, FlutterPlugin {
                         let singlePageFilenameUrl = NSURL.fileURL(withPath: singlePageFilename)
                         let singlePage = PDFDocument.init()
                         singlePage.insert(page, at: 0)
-                        
-                    
-                        let documentDataForSaving : Data! = singlePage.dataRepresentation()
-                        
+
+                      // https://stackoverflow.com/questions/6553540/merge-pdf-files-on-ios/64191028#64191028
                         do {
+                            let documentDataForSaving : Data! = singlePage.dataRepresentation()
                             try documentDataForSaving?.write(to: singlePageFilenameUrl)
                         } catch {
                             print(error)
