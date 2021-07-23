@@ -111,12 +111,12 @@ class SplitTask extends AsyncTask<Object, Void, Map> {
         Iterator<PDDocument> iterator = Pages.listIterator();
 
         //Saving each page as an individual document
-        int i = 1;
+        int i = 0;
         List<String> pagePaths = new ArrayList<>();
 
         while (iterator.hasNext()) {
             PDDocument pd = iterator.next();
-            String singlePageFileName = outDirectory + "/" + outFileNamePrefix + i++ + ".pdf";
+            String singlePageFileName = outDirectory + "/" + outFileNamePrefix + " " + i++ + ".pdf";
             try {
                 pd.save(singlePageFileName);
                 android.util.Log.d("PDF_SPLIT", "onMethodCall: " + singlePageFileName);
