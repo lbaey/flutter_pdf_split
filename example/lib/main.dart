@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdf_split/flutter_pdf_split.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 
 void main() {
   runApp(MyApp());
@@ -16,20 +17,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  FlutterPdfSplitResult _splitResult;
-  String _outDirectory;
+  String? _platformVersion = 'Unknown';
+  FlutterPdfSplitResult? _splitResult;
+  String? _outDirectory;
+
+  static final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  AndroidDeviceInfo? androidInfo;
+  Future<void> androidDeviceInfo() async {
+    androidInfo = await deviceInfo.androidInfo;
+  }
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-    askPermission();
+    if (Platform.isAndroid) {
+      androidDeviceInfo().whenComplete(() {
+        initPlatformState();
+        askPermission();
+        return null;
+      });
+    }
   }
 
   /// Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
+    String? platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       platformVersion = await FlutterPdfSplit.platformVersion;
@@ -44,7 +56,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> askPermission() async {
-    await Permission.storage.request();
+    if (androidInfo != null) {
+      if (androidInfo!.version.sdkInt! >= 30 && Platform.isAndroid) {
+        await Permission.manageExternalStorage.request();
+      } else if (androidInfo!.version.sdkInt! < 30 && Platform.isAndroid) {
+        await Permission.storage.request();
+      }
+    }
   }
 
   void _openFileExplorer() async {
@@ -53,7 +71,7 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    FilePickerResult result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       PlatformFile file = result.files.first;
@@ -65,7 +83,7 @@ class _MyAppState extends State<MyApp> {
       debugPrint(file.path);
 
       FlutterPdfSplitResult splitResult = await FlutterPdfSplit.split(
-        FlutterPdfSplitArgs(file.path, _outDirectory, outFilePrefix: "Test"),
+        FlutterPdfSplitArgs(file.path!, _outDirectory!, outFilePrefix: "Test"),
       );
 
       debugPrint(splitResult.toString());
@@ -77,7 +95,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _openDirectoryExplorer() async {
-    String directory = await FilePicker.platform.getDirectoryPath();
+    String? directory = await FilePicker.platform.getDirectoryPath();
 
     if (directory != null) {
       debugPrint(directory);
@@ -105,11 +123,11 @@ class _MyAppState extends State<MyApp> {
                     padding: const EdgeInsets.all(14),
                     child: Text('Running on: $_platformVersion'),
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     onPressed: _openDirectoryExplorer,
                     child: Text("Choose output directory"),
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     onPressed: _outDirectory == null ? null : _openFileExplorer,
                     child: Text("Choose input PDF file"),
                   ),
